@@ -102,7 +102,7 @@ AutoBar_Category_Info = { -- global
 	["MANAPOTIONS"] = {
 		["description"] = "Mana Potions";
 		["texture"] = "INV_Potion_70";
-		["limit"] = { ["downmana"] = { 140, 280, 455, 700, 900, 1350} },
+		["limit"] = { ["downmana"] = { 140, 280, 455, 700, 900, 1800} },
 	},
 	["MANASTONE"] = {
 		["description"] = "Manastones";
@@ -359,6 +359,38 @@ AutoBar_Category_Info = { -- global
 		        6533, -- Aquadynamic Fish Attractors
 		},
 	},
+    ["INVUPOTS"] = {
+        ["texture"] = "INV_Potion_62",
+        ["description"] = "Invulnerability Pots",
+        ["items"] = {
+            3387, -- invu pot
+        },
+    },
+    ["CUREPOISON"] = {
+        ["texture"] = "INV_Misc_Slime_01",
+        ["description"] = "Poison Cures",
+        ["items"] = {
+            19440, -- powerful anti venom
+            6453, -- strong anti venom
+            3368, -- elixir of poison resistance
+        },
+    },
+    ["TEA_WITH_SUGAR_MANA"] = {
+        ["texture"] = "INV_Drink_15",
+        ["description"] = "Tea with Sugar (MANA)",
+        ["items"] = {
+            15723, -- tea with sugar
+        },
+		["limit"] = { ["downmana"] = { 1751 } },
+    },
+    ["TEA_WITH_SUGAR_HP"] = {
+        ["texture"] = "INV_Drink_15",
+        ["description"] = "Tea with Sugar (HP)",
+        ["items"] = {
+            15723, -- tea with sugar
+        },
+		["limit"] = { ["downhp"] = { 1751 } },
+    },
 };
 
 AutoBar_Category_Info["BANDAGES"].items = {
@@ -434,6 +466,8 @@ AutoBar_Category_Info["WATER_CONJURED"].items = {
 		8077,	-- Conjured Mineral Water
 		8078,	-- Conjured Sparkling Water
 		8079,	-- Conjured Crystal Water
+		83004,	-- Conjured Mana Orange
+        
 };
 AutoBar_Category_Info["RAGEPOTIONS"].items = {
 		5631,	-- Rage Potion
@@ -560,6 +594,7 @@ AutoBar_Category_Info["FOOD"].items = {
 		13933,	-- Lobster Stew			-- Cooking - Level 45, heals 2148
 };
 AutoBar_Category_Info["FOOD_STAMINA"].items = {
+        21151, -- rumsey rum black label
 		6888,	-- Herb Baked Egg	-- Cooking - Level 1, heals 61, stamina/spirit
 		12224,	-- Crispy Bat Wing	-- Cooking - Level 1, heals 61, stamina/spirit
 		17197,	-- Gingerbread Cookie	-- Cooking - Level 1, heals 61, stamina/spirit
