@@ -457,6 +457,8 @@ AutoBar_Category_Info["WATER"].items = {
 		1645,	-- Moonberry Juice
 		8766,	-- Morning Glory Dew
 		19318,	-- Bottled Alterac Spring Water
+        13813, -- blessed sunfruit juice
+        21215, -- graccu's mince meat fruitcake
 };
 AutoBar_Category_Info["WATER_CONJURED"].items = {
 		5350,	-- Conjured Water
