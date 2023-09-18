@@ -1,43 +1,43 @@
 --
---  AutoBar
---  Copyright 2004, 2005, 2006 original author. 
---  Copyright is expressly not transferred to Blizzard.
+--	AutoBar
+--	Copyright 2004, 2005, 2006 original author. 
+--	Copyright is expressly not transferred to Blizzard.
 -- 
---  Configurable set of 12 buttons that seeks out configured items 
---  in your pack for use. Intended primarily for consumables. Not 
---  for use with spells, skills, trinkets, or powers.
+--	Configurable set of 12 buttons that seeks out configured items 
+--	in your pack for use. Intended primarily for consumables. Not 
+--	for use with spells, skills, trinkets, or powers.
 --
---  Author: Marc aka Saien on Hyjal
---  WOWSaien@gmail.com
---  http://64.168.251.69/wow
+--	Author: Marc aka Saien on Hyjal
+--	WOWSaien@gmail.com
+--	http://64.168.251.69/wow
 --
---  2006.03.31
---    Minor category changes
---  2006.02.10
---    Enriched Manna Biscuit/Alterac Manna Biscuit (which is usable everywhere) 
---      moved to their own category("Food & Water Combo") - Update your buttons
---    Custom items can now appear on multiple buttons, as intended.
---  2006.01.28
---    Oils fixed.
---    Custom items got broken by selfcast config. Fixed. 
---  2006.01.20
---    Will no longer fallback to zone-restricted items when all items in a button are ineligible.
---    Fixed bug where hitting keybinding for a button that has no items found will popup an error
---    Buttons will skip items too high in level for character
---  2006.01.12
---    Selfcast is back
---    AutoBar re-parented so it hides with an Alt-Z
---    Configuration checkbox to hide Keybind text 
---    Configuration checkbox to hide Count text
---    Configuration checkbox to show empty buttons
---    Keybind text and count text scales with button width.
---    Can now open configuration while dead.
---    "Num Pad" key bindings are now shortened to just N in display.
---    Removed /ab as a shortcut for the depreciated slash commands.
---    Fixed Mana potion hp restriction - should be mana restriction
---    Minimum button width/height set to 9 pixels instead of 18.
---  2006.01.06
---    Release of complete re-write.
+--	2006.03.31
+--	  Minor category changes
+--	2006.02.10
+--	  Enriched Manna Biscuit/Alterac Manna Biscuit (which is usable everywhere) 
+--		moved to their own category("Food & Water Combo") - Update your buttons
+--	  Custom items can now appear on multiple buttons, as intended.
+--	2006.01.28
+--	  Oils fixed.
+--	  Custom items got broken by selfcast config. Fixed. 
+--	2006.01.20
+--	  Will no longer fallback to zone-restricted items when all items in a button are ineligible.
+--	  Fixed bug where hitting keybinding for a button that has no items found will popup an error
+--	  Buttons will skip items too high in level for character
+--	2006.01.12
+--	  Selfcast is back
+--	  AutoBar re-parented so it hides with an Alt-Z
+--	  Configuration checkbox to hide Keybind text 
+--	  Configuration checkbox to hide Count text
+--	  Configuration checkbox to show empty buttons
+--	  Keybind text and count text scales with button width.
+--	  Can now open configuration while dead.
+--	  "Num Pad" key bindings are now shortened to just N in display.
+--	  Removed /ab as a shortcut for the depreciated slash commands.
+--	  Fixed Mana potion hp restriction - should be mana restriction
+--	  Minimum button width/height set to 9 pixels instead of 18.
+--	2006.01.06
+--	  Release of complete re-write.
 --
 
 AUTOBAR_VERSION = "2006.02.10" -- Notice the cleverly disguised date.
@@ -59,7 +59,7 @@ BINDING_NAME_AUTOBAR_BUTTON12 = "Button 12";
 ------------------------------------
 AUTOBAR_MAXBUTTONS = 12;
 -----------------------------------
-AutoBar_Debug = nil;
+AutoBar_Debug = 0;
 AutoBar_Player = nil; -- global
 --
 local AutoBar_ConfigLoaded = nil;
@@ -70,6 +70,7 @@ local AutoBar_Buttons_CurrentItems = {};
 --
 local AutoBar_InWorld = nil;
 local AutoBar_InCombat = nil; -- For item use restrictions
+local AutoBar_UpdateTick = 0
 ------------------------------------
 
 local function AutoBar_LinkDecode(link)
@@ -81,14 +82,39 @@ local function AutoBar_LinkDecode(link)
 	end
 end
 
+local function AutoBar_SetTime(buttonnum,  cdstart, cdduration, cdenable)
+	cdtimetext = getglobal("AutoBar_Button"..buttonnum.."TimeText");
+
+	local cooldown = cdduration - (GetTime() - cdstart)
+	local cooldownText
+
+	if cdstart == 0 then
+		-- item has no cooldown
+		cdtimetext:SetText("")
+	elseif cooldown < 3 and not cdtimetext:GetText() then
+		-- do not display global cooldown
+		-- if there is already a text it is just a cooldown that entered into this state
+	else
+		if cooldown < 100 then
+			cooldownText = math.floor(cooldown + .5)
+		elseif cooldown < 3600 then
+			cooldownText = math.ceil(cooldown / 60) .. " m"
+		else
+			cooldownText = math.ceil(cooldown / 3600) .. " h"
+		end
+		cdtimetext:SetText(cooldownText)
+	end
+
+end
+
 local function AutoBar_ConfigInit()
 	if (not AutoBar_Config) then AutoBar_Config = {}; end
 	if (not AutoBar_Config[AutoBar_Player]) then AutoBar_Config[AutoBar_Player] = {}; end
 	---
 	if (AutoBar_Config[AutoBar_Player].docked and AutoBar_Config[AutoBar_Player].scaling and 
-	    AutoBar_Config[AutoBar_Player].rows and AutoBar_Config[AutoBar_Player].columns) then
+		AutoBar_Config[AutoBar_Player].rows and AutoBar_Config[AutoBar_Player].columns) then
 		-- Config is from pre re-write. Not upgrading.
- 		AutoBar_Config[AutoBar_Player] = {};
+		AutoBar_Config[AutoBar_Player] = {};
 		AutoBar_Msg("Config for this character is old version. Clearing. No attempt to upgrade config is being done.");
 	end
 	---
@@ -104,7 +130,7 @@ local function AutoBar_ConfigInit()
 		elseif (class == "MAGE") then
 			AutoBar_Config[AutoBar_Player].buttons[3] = { "MANAPOTIONS", "REJUVENATION_POTIONS", "NIGHT_DRAGONS_BREATH", "PVP_MANAPOTIONS", "ALTERAC_MANA", "MANASTONE" };
 		else
-			AutoBar_Config[AutoBar_Player].buttons[3] = { "MANAPOTIONS", "REJUVENATION_POTIONS", "NIGHT_DRAGONS_BREATH", "PVP_MANAPOTIONS", "ALTERAC_MANA"  };
+			AutoBar_Config[AutoBar_Player].buttons[3] = { "MANAPOTIONS", "REJUVENATION_POTIONS", "NIGHT_DRAGONS_BREATH", "PVP_MANAPOTIONS", "ALTERAC_MANA"	};
 		end
 		if (class ~= "ROGUE" and class ~= "WARRIOR") then
 			AutoBar_Config[AutoBar_Player].buttons[4] = { "WATER", "WATER_CONJURED" };
@@ -276,6 +302,7 @@ function AutoBar_Button_UpdateButtons()
 		normaltexture = getglobal("AutoBar_Button"..buttonnum.."NormalTexture");
 		counttxt = getglobal("AutoBar_Button"..buttonnum.."Count");
 		hotkey = getglobal("AutoBar_Button"..buttonnum.."HotKey");
+		
 		if (not button.forcehidden and button.effectiveButton) then
 			button:Show();
 			bag, slot,_,_,_,_,idx,enabled = AutoBar_Button_GetDisplayItem(button.effectiveButton)
@@ -288,6 +315,8 @@ function AutoBar_Button_UpdateButtons()
 						count = count + tmpcount;
 					end
 				end
+				local cdstart, cdduration, cdenable = GetContainerItemCooldown(bag, slot);
+				AutoBar_SetTime(buttonnum, cdstart, cdduration, cdenable)
 				icon:SetTexture(GetContainerItemInfo(bag,slot));
 				if (count > 1) then
 					counttxt:SetText(count);
@@ -400,8 +429,8 @@ function AutoBar_ScanBags(specificbag)
 			else
 				table.insert(AutoBar_Buttons_CurrentItems[buttonnum],
 					{
-				 		["rank"] = rank,
-				 		["items"] = { { bag, slot } }
+						["rank"] = rank,
+						["items"] = { { bag, slot } }
 					}
 				);
 			end
@@ -465,9 +494,9 @@ function AutoBar_ScanBags(specificbag)
 	end
 	local buttonnum;
 	for buttonnum = 1, AUTOBAR_MAXBUTTONS, 1 do
-	 	if (AutoBar_Buttons_CurrentItems[buttonnum]) then
+		if (AutoBar_Buttons_CurrentItems[buttonnum]) then
 			table.sort(AutoBar_Buttons_CurrentItems[buttonnum], SortByRank);
-	 	end
+		end
 	end
 	AutoBar_AssignButtons();
 end
@@ -767,6 +796,17 @@ function AutoBar_SetupVisual()
 			texture = getglobal("AutoBar_Button"..i.."NormalTexture");
 			counttxt = getglobal("AutoBar_Button"..i.."Count");
 			hotkey = getglobal("AutoBar_Button"..i.."HotKey");
+
+			cdtime = getglobal("AutoBar_Button"..i.."Time");
+			cdtime:SetAllPoints(button)
+			cdtime:SetFrameLevel(button:GetFrameLevel() + 1)
+			cdtime:SetAlpha(alpha)
+			cdtime:SetParent(button)
+			cdtext = getglobal("AutoBar_Button"..i.."TimeText");
+			fonttext, fontsize, fontoptions = counttxt:GetFont();
+			cdtext:SetFont(fonttext, 25*percent, fontoptions)
+			cdtext:SetText("")
+
 			button.forcehidden = nil;
 			button:SetAlpha(alpha);
 			texture:SetAlpha(alpha);
@@ -818,3 +858,10 @@ function AutoBar_SetupVisual()
 	AutoBar_Button_UpdateButtons();
 end
 
+
+function AutoBar_OnUpdate(elapsed)
+	AutoBar_UpdateTick = AutoBar_UpdateTick - elapsed
+	if AutoBar_UpdateTick > 0 then return end
+	AutoBar_UpdateTick = 0.1
+	AutoBar_Button_UpdateButtons();
+end
