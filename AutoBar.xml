@@ -26,13 +26,29 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</OnLeave>
 		</Scripts>
 	</CheckButton>
+
+	<Frame name="AutoBar_TimeTemplate" enableMouse="false" virtual="true">
+		<Size>
+		<AbsDimension x="36" y="12"/>
+		</Size>
+		<Anchors>
+		<Anchor point="BOTTOMRIGHT"/>
+		</Anchors>
+		<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parentText" inherits="GameFontHighlight" justifyH="CENTER"/>
+		</Layer>
+		</Layers>
+	</Frame>
+
+
 	<Frame name="AutoBar" parent="UIParent">
 		<Size>
 			<AbsDimension x="1" y="1"/>
 		</Size>
 		<Scripts>
-        		<OnLoad>
-            			AutoBar_OnLoad();
+				<OnLoad>
+						AutoBar_OnLoad();
 			</OnLoad>
 			<OnEvent>
 				AutoBar_OnEvent(event);
@@ -43,6 +59,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				else
 					this.updateTooltip = nil;
 				end
+				AutoBar_OnUpdate(arg1)
 			</OnUpdate>
 		</Scripts>
 		<Frames>
@@ -58,6 +75,19 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<CheckButton name="$parent_Button10" inherits="AutoBar_ButtonTemplate"/>
 			<CheckButton name="$parent_Button11" inherits="AutoBar_ButtonTemplate"/>
 			<CheckButton name="$parent_Button12" inherits="AutoBar_ButtonTemplate"/>
+
+			<Frame name="$parent_Button1Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button2Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button3Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button4Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button5Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button6Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button7Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button8Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button9Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button10Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button11Time" inherits="AutoBar_TimeTemplate"/>
+			<Frame name="$parent_Button12Time" inherits="AutoBar_TimeTemplate"/>
 		</Frames>
 	</Frame>
 </Ui>
