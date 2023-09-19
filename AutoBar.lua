@@ -315,8 +315,6 @@ function AutoBar_Button_UpdateButtons()
 						count = count + tmpcount;
 					end
 				end
-				local cdstart, cdduration, cdenable = GetContainerItemCooldown(bag, slot);
-				AutoBar_SetTime(buttonnum, cdstart, cdduration, cdenable)
 				icon:SetTexture(GetContainerItemInfo(bag,slot));
 				if (count > 1) then
 					counttxt:SetText(count);
@@ -350,6 +348,21 @@ function AutoBar_Button_UpdateButtons()
 			end
 		else
 			button:Hide();
+		end
+	end
+end
+
+function AutoBar_Button_UpdateButtonCoooldowns()
+	local buttonnum
+	for buttonnum = 1, AUTOBAR_MAXBUTTONS, 1 do
+		button = getglobal("AutoBar_Button"..buttonnum);
+		
+		if (not button.forcehidden and button.effectiveButton) then
+			bag, slot,_,_,_,_,idx,enabled = AutoBar_Button_GetDisplayItem(button.effectiveButton)
+			if (bag and slot) then
+				local cdstart, cdduration, cdenable = GetContainerItemCooldown(bag, slot);
+				AutoBar_SetTime(buttonnum, cdstart, cdduration, cdenable)
+			end
 		end
 	end
 end
@@ -863,5 +876,5 @@ function AutoBar_OnUpdate(elapsed)
 	AutoBar_UpdateTick = AutoBar_UpdateTick - elapsed
 	if AutoBar_UpdateTick > 0 then return end
 	AutoBar_UpdateTick = 0.1
-	AutoBar_Button_UpdateButtons();
+	AutoBar_Button_UpdateButtonCoooldowns()
 end
