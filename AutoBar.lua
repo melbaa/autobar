@@ -98,9 +98,9 @@ local function AutoBar_SetTime(buttonnum,  cdstart, cdduration, cdenable)
 		if cooldown < 100 then
 			cooldownText = math.floor(cooldown + .5)
 		elseif cooldown < 3600 then
-			cooldownText = math.ceil(cooldown / 60) .. " m"
+			cooldownText = math.ceil(cooldown / 60) .. "m"
 		else
-			cooldownText = math.ceil(cooldown / 3600) .. " h"
+			cooldownText = math.ceil(cooldown / 3600) .. "h"
 		end
 		cdtimetext:SetText(cooldownText)
 	end
@@ -804,7 +804,7 @@ function AutoBar_SetupVisual()
 			cdtime:SetParent(button)
 			cdtext = getglobal("AutoBar_Button"..i.."TimeText");
 			fonttext, fontsize, fontoptions = counttxt:GetFont();
-			cdtext:SetFont(fonttext, 25*percent, fontoptions)
+			cdtext:SetFont(fonttext, 15*percent, fontoptions)
 			cdtext:SetText("")
 
 			button.forcehidden = nil;
